@@ -20,7 +20,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '*+q*n$f#i@wa=en-txwah*92%yy#%%d%qf=vd)!h@r^%4k_9*3'
+keyFile = open("/Users/62m/Dropbox (ORNL)/AFAE/Code/DataVizTrials/DataVizTrials/secrets.txt", "r")
+SECRET_KEY = keyFile.readline()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -70,6 +71,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'DataVizTrials.wsgi.application'
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
