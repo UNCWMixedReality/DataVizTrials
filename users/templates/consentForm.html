@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+    <head>
+        <title>Data Viz Trial Sign Up</title>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+    </head>
+    <body>
+        <div class="page-header">
+            <a href="{% url 'recordConsent' %}" class="top-menu"></a>
+            <h2><a href="/">Consent to Participate in a Research Study</a></h2>
+        </div>
+        <div class="content container">
+            <div class="row">
+                <div class="col-md-8">
+                    {% block content %}
+                    <h1>Binary Image Processing Across Different Technologies</h1>
+                    <h2> Introduction </h2>
+                    <p> We are inviting you to take part in a research study about the design of user interfaces among different devices 
+                        for the task of image tagging. We are interested in how our user interface designs for each device differs between 
+                        virtual reality, augmented reality, tablets, and standard monitor set ups. The person in charge of this study is 
+                        Toni Pence, Assistant Professor in the Department of Computer Science at the University of North Carolina Wilmington. 
+                        Your participation consists of a pre-questionnaire, performing tasks by interacting with different user interface designs, 
+                        post-questionnaire, and a debriefing. Your participation is expected to be around 30 minutes and no more than 1 hour</p>
+                    <p> Your participation is voluntary. You may refuse to answer any question. You may stop at anytime without penalty.</p>
+                
+                    <h2>Consent</h2>
+                    <p>“By proceeding to the next screen, you consent to participating in this study. Would you like to proceed?”</p>
+                        <form method="POST" class="post-form"> {% csrf_token %} 
+                            <button type="submit" value = "Val1" class="save btn btn-default" name="yes">Yes</button>
+                            <button type="submit" value = "Val2" class="save btn btn-default" name="no">No</button> 
+                        </form>
+                        {% endblock %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
