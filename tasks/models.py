@@ -1,20 +1,18 @@
 from django.db import models
+from jsonfield import JSONField
 
 # Create your models here.
 
 class ImageData(models.Model):
 
-    ##### example data types from user models
-
-    # byteImg = models. # can this have byte?
-    # first_name = models.CharField(max_length=32) 
-    # last_name = models.CharField(max_length=32)
-
-    # pin = models.PositiveIntegerField( unique=True, null=True)
-    # #can also use models.AutoField if we just want to increment the pin.
-
-    # waiver = models.BooleanField(null=True)
-
+    serializedPhoto = models.BinaryField()
+    taskCorrect = models.BooleanField()
+    userCorrect = models.BooleanField()
+    userUndo = models.BooleanField()
+    photoID = models.IntegerField(unique=True)
+    taskImage = models.ImageField() # correct field type? need dimension constraints?
+    userDecisionPoints = JSONField()
+    taskDimensions = JSONField() # correct usage?
 
     ##### data we're collecting for images
 
