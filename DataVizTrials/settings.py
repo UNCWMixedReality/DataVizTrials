@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-keyFile = open("/Users/62m/Dropbox (ORNL)/AFAE/Code/DataVizTrials/DataVizTrials/secrets.txt", "r")
+keyFile = open(os.path.join(os.path.realpath("."),"DataVizTrials/secrets.txt"), "r")
 SECRET_KEY = keyFile.readline()
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -121,3 +121,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+ALLOWED_HOSTS = ['vr.uncw.edu']
