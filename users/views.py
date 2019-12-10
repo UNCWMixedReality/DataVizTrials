@@ -8,6 +8,8 @@ from .models import UserData
 
 from random import randint
 
+import psycopg2
+
 def index(request):
     #template = loader.get_template('index.html')
     return render(request, "index.html")  # error if "template" var is used ...

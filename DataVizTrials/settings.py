@@ -26,7 +26,7 @@ SECRET_KEY = keyFile.readline()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['vr.uncw.edu']
 
 
 # Application definition
@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
+    'tasks.apps.TasksConfig',
+    'data_collection.apps.DataCollectionConfig',
 ]
 
 MIDDLEWARE = [
@@ -77,10 +79,18 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #}
+
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': keyFile.readline()[:-1],
+        'USER': keyFile.readline()[:-1],
+        'PASSWORD': keyFile.readline()[:-1],
+        'HOST': keyFile.readline()[:-1],
+        }
 }
 
 
@@ -121,5 +131,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
-ALLOWED_HOSTS = ['vr.uncw.edu']
