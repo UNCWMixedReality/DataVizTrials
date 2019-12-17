@@ -38,7 +38,7 @@ def recordConsent(request):
     user = UserData.objects.get(pin=pin)
 
     if request.method == "POST":
-        if request.POST.get("yes") == "Val1":
+        if request.POST.get("yes"):
             # access session; get user; redirect to next page w/ pin
             template = loader.get_template('showUserInfo.html')
             user.waiver = True
@@ -46,7 +46,7 @@ def recordConsent(request):
                 'user': user,
             }
             return HttpResponse(template.render(context, request))
-        else:
+        elif request.POST.get("no"):
             user.waiver = False
             return HttpResponse("<h2> Thank you for your time. </h2>")
         # log user out
