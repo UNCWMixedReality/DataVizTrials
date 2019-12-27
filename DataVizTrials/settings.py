@@ -26,7 +26,7 @@ SECRET_KEY = keyFile.readline()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['vr.uncw.edu']
+ALLOWED_HOSTS = ['vr.uncw.edu', 'localhost', '127.0.0.1']
 
 
 # Application definition
