@@ -35,6 +35,8 @@ def practice(request):
             category = data['category']
         except KeyError:
             HttpResponseNotFound("Malformed data!")
+    elif request.method == "GET":
+        return HttpResponse("connection established!")
     else:
         return HttpResponseNotFound()
 
