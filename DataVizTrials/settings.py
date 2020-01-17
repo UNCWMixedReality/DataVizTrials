@@ -29,8 +29,6 @@ DEBUG = True
 hostFile = open(os.path.join(os.path.realpath("."),"DataVizTrials/hosts.txt"), "r")
 hosts = hostFile.readlines()
 ALLOWED_HOSTS = [x.strip('\n') for x in hosts]
-#ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-
 
 # Application definition
 
