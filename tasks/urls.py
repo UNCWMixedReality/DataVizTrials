@@ -18,5 +18,5 @@ from django.urls import path
 from tasks import views
 
 urlpatterns = [
-    path("practice", views.practice, name='practice'),
+    path("imageUpload", views.imageUpload, name='imageUpload'),
 ]

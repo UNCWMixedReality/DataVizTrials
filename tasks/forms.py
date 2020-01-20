@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import UserData
+from .models import TaskData
 
-class PracticeForm():
+class ImageUploadForm():
     pass

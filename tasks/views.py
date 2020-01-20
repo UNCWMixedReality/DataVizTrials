@@ -22,7 +22,7 @@ tokens = [x.strip('\n') for x in tokens]
 
 @csrf_exempt
 #@api_view(['POST'])
-def practice(request):
+def imageUpload(request):
     if request.method == "POST":
         print(request.POST)
         data=request.POST
