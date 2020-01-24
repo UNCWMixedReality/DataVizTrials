@@ -24,4 +24,5 @@ urlpatterns = [
     path("consentForm", views.recordConsent, name='recordConsent'),
     path("user", views.signup, name='showUserInfo'),
     path("validate", views.retrieveUserInfo, name='retrieveUserInfo'),
+    path("getName", views.getName, name='getName'),
 ]

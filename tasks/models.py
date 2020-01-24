@@ -1,5 +1,4 @@
 from django.db import models
-#from jsonfield import JSONField
 
 # Create your models here.
 
@@ -15,9 +14,9 @@ class ImageData(models.Model):
 
     image_id = models.AutoField(primary_key=True)
     task_id = models.IntegerField()
+    in_category = models.BooleanField()
     image_path = models.TextField()
     texture_path = models.TextField()
-    in_category = models.BooleanField()
 
     def __str__(self):
         return self.first_name

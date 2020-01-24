@@ -16,3 +16,6 @@ class RetrieveUserDataForm(forms.Form):
 # TODO: do we actually need a yes, no answer or just a "btw"
 class RecordConsentForm():
     pass
+
+class GetNameForm(forms.Form):
+    pin = forms.IntegerField()
