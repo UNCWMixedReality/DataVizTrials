@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, JsonResponse
 
 from django.template import loader
 from wand import image
@@ -29,14 +29,16 @@ tokens = [x.strip('\n') for x in tokens]
 # - DONE: parameterize "returnVal" functions
 # - DONE: create form w/ file field or image field for imageUpload post req
 #   - leaves out files for now... how to do it with multiple?
+# - reading tokens.txt in each app is repetitive
 
 # needs better success response
-# maybe form should have ImageField, handle multiple
+
 @csrf_exempt
 def imageUpload(request):
     if request.method == "POST":
         print(request.FILES)
         data=request.POST
+        print(data)
         form = ImageUploadForm(request.POST, {})
         if not form.is_valid():
             return HttpResponseNotFound("request isn't valid")
@@ -64,7 +66,6 @@ def addImage(data, photo):
     else:
         image_object.in_category = False
         folder = "negative"
-    image_object.save()
 
     print("adding image to task", task.num_of_photos)
     task.num_of_photos += 1
@@ -78,6 +79,8 @@ def addImage(data, photo):
     texture_path = os.path.join(dataPath, data['category'], folder, "texture")
     convertImgToDds(original_path, task.num_of_photos, texture_path)
     image_object.texture_path = os.path.join(texture_path, str(task.num_of_photos)+".dds")
+
+    image_object.save()
 
 def addCategory(category):
     addCategoryToTable(category)
@@ -119,54 +122,3 @@ def convertImgToDds(img,id,path):
     with image.Image(filename=img) as im:
         im.compression = "dxt3"
         im.save(filename=os.path.join(path,str(id)+".dds"))
-
-## is there a way to parameterize this?
-# def returnRecord(model, filter):
-#     filter = formatFilter(filterPairs)
-
-#     return findRecord(model, searchDict)
-
-
-#### may not need the following functions anymore
-def checkTaskId(id):
-    try:
-        TaskData.objects.get(task_id=id)
-        return True
-    except:
-        return False
-
-# assumes checkTaskId was called before running this function
-def returnTaskId(category):
-    task = TaskData.objects.get(category=category)
-    return task.task_id
-
-def checkCategory(category):
-    try:
-        TaskData.objects.get(category=category)
-        return True
-    except:
-        return False
-
-# assumes checkCategory was called before running this function
-def returnCategory(id):
-    task = TaskData.objects.get(task_id=id)
-    return task.category
-
-def checkImageId(id):
-    try:
-        ImageData.objects.get(image_id=id)
-        return True
-    except:
-        return False
-
-def checkEnvCategories(device, grid):
-    try:
-        Environments.objects.filter(device=device, grid=grid)
-        return True
-    except:
-        return False
-
-# assumes checkEnvCategories was called before running this function
-def returnEnvId(device, grid):
-    environment = Environments.objects.get(device=device, grid=grid)
-    return environment.env_id

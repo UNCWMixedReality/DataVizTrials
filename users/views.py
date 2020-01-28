@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, JsonResponse
 
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
@@ -9,9 +9,7 @@ from .forms import UserDataForm, RecordConsentForm, RetrieveUserDataForm, GetNam
 from .models import UserData
 
 from random import randint
-
-import psycopg2
-
+import json # for testing
 
 # TODO: 
 # - getName function level 1 else statement needs to be tested
@@ -127,12 +125,12 @@ def getName(request):
         if not form.is_valid():
             return HttpResponse("request isn't valid")
         data=request.POST
+        print(data)
         try:    
             if(checkRecordExistence(UserData, formatFilter([("pin",data["pin"])]))):
                 user = getRecord(UserData,formatFilter([("pin", data["pin"])]))
-                response = HttpResponse()
-                response['name'] = " ".join([user.first_name, user.last_name])
-                print(response['name'])
+                response = JsonResponse({'name': " ".join([user.first_name, user.last_name])})
+                print(json.loads(response.content)['name']) # test
                 return response
             else:
                 return HttpResponse("pin doesn't exist")
@@ -158,38 +156,3 @@ def generateUsablePin():
 def generatePin():
     pin = randint(1000, 9999)
     return pin
-
-#### may not need the following functions anymore
-
-# TODO: what if there are multiple users with the same full name? 
-def checkUser(first_name, last_name):
-    try:
-        UserData.objects.filter(first_name=first_name, last_name=last_name)
-        return True
-    except:
-        return False
-
-# assumes checkUser was called before running this function
-def returnUser(pin):
-    user = UserData.objects.get(pin=pin)
-    return [user.first_name, user.last_name]
-
-def checkPin(pin):
-    try:
-        UserData.objects.get(pin=pin)
-        return True
-    except:
-        return False
-
-# assumes checkPin was called before running this function
-def returnPin(first_name, last_name):
-    #checkUser(first_name, last_name):
-    pin = UserData.objects.filter(first_name=first_name, last_name=last_name)[0].pin
-    return pin
-    #else:
-    #    return "This user is not registered"
-
-
-
-
-

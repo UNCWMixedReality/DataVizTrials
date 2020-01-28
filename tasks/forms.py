@@ -8,6 +8,6 @@ class ImageUploadForm(forms.Form):
     #photos = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
     #photo1 = forms.ImageField()
     #photo2 = forms.ImageField()
-    token = forms.CharField
-    in_category = forms.BooleanField()
+    token = forms.CharField()
+    in_category = forms.BooleanField(required=False)
     # following data is kept across 2 diff tables

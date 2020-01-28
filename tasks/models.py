@@ -19,10 +19,13 @@ class ImageData(models.Model):
     texture_path = models.TextField()
 
     def __str__(self):
-        return self.first_name
+        return str(self.image_id)
 
 class Environments(models.Model):
 
     env_id = models.AutoField(primary_key=True)
     device = models.CharField(max_length=255)
     grid = models.BooleanField()
+
+    def __str__(self):
+        return str(self.env_id)
