@@ -127,8 +127,9 @@ def checkLogin(request):
 def getName(request):
     if request.method == "POST":
         data=request.POST
+        print(data)
         form = GetNameForm(request.POST)
-        print(form)
+        #print(form)
         if not form.is_valid():
             print(form.errors.as_json())
             response = json.loads(form.errors.as_json())

@@ -22,6 +22,8 @@ import base64
 import json # for testing
 import random
 
+#from django.http.request import QueryDict # was used for testing request input
+
 # TODO:
 # - DONE: chooseRandomTask - find way to be pseudo-random / equal distribution
 # - DONE: may need to use json.loads instead for requests form unity
@@ -32,8 +34,7 @@ import random
 def uploadExperimentParameters(request):
     if request.method == 'POST':
         data =  json.loads(request.body)
-        form = UploadExperimentParametersForm(data, request.FILES)
-        print(data)
+        form = UploadExperimentParametersForm(data)
         if not form.is_valid():
             print(form.errors.as_json())
             response = json.loads(form.errors.as_json())
