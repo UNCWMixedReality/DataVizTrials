@@ -41,7 +41,6 @@ def signup(request):
         return HttpResponseRedirect('/users/consentForm')
     else:
         form = UserDataForm
-        return HttpResponse(template.render(context, request))
         return render(request, 'signup.html', {'form': form})
 
 # TODO: what to do if they log out by accident before responding to consent form?
