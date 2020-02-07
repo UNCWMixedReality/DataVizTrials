@@ -31,20 +31,22 @@ import random
 @csrf_exempt
 def uploadExperimentParameters(request):
     if request.method == 'POST':
-        form = UploadExperimentParametersForm(json.loads(request.body), request.FILES)
+        data =  json.loads(request.body)
+        form = UploadExperimentParametersForm(data, request.FILES)
+        print(data)
         if not form.is_valid():
             print(form.errors.as_json())
             response = json.loads(form.errors.as_json())
             print(response["__all__"][0]["message"])
             return HttpResponse("request isn't valid, "+response["__all__"][0]["message"])
         
-        if not checkRecordExistence(UserData, {'pin':form.data['userPin']}):
+        if not checkRecordExistence(UserData, {'pin':form.data['user_id']}):
             return HttpResponse("pin not found")
         
-        if not checkRecordExistence(Environments, {'device':form.data['Device'], 'grid':form.data['GridInterface']}):
+        if not checkRecordExistence(Environments, {'device':form.data['device'], 'grid':form.data['grid']}):
             return HttpResponse("environment conditions not found")
 
-        response = JsonResponse({'TrialID': addTrialToTable(form)})
+        response = JsonResponse({'trial_id': addTrialToTable(form)})
         return response
     else:
         return HttpResponseNotFound()
@@ -53,19 +55,21 @@ def uploadExperimentParameters(request):
 @csrf_exempt
 def sendTaskData(request):
     if request.method == 'POST':
-        form = SendTaskDataForm(json.loads(request.body), request.FILES)
+        data =  json.loads(request.body)
+        form = SendTaskDataForm(data, request.FILES)
+        print(data)
         if not form.is_valid():
             print(form.errors.as_json())
             response = json.loads(form.errors.as_json())
             print(response["__all__"][0]["message"])
             return HttpResponse("request isn't valid, "+response["__all__"][0]["message"])
         
-        if not checkRecordExistence(TrialData, {'trial_id':form.data['TrialID']}):
+        if not checkRecordExistence(TrialData, {'trial_id':form.data['trial_id']}):
             return HttpResponse("trial id not found")
 
-        trial = getRecord(TrialData, {'trial_id':form.data['TrialID']})
+        trial = getRecord(TrialData, {'trial_id':form.data['trial_id']})
         task = getRecord(TaskData, {'task_id':trial.task_id})
-        response = JsonResponse({'tag': task.category, 'imageTasks': getTaskData(form.data['TrialID'], trial.env_id)})
+        response = JsonResponse({'category': task.category, 'image_tasks': getTaskData(form.data['trial_id'], trial.env_id)})
         return response
     else:
         return HttpResponseNotFound()
@@ -78,14 +82,15 @@ def sendTaskData(request):
 def uploadExperimentData(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        form = SendTaskDataForm({"token":data['token'], "TrialID":data["TrialID"]}, request.FILES)
+        form = SendTaskDataForm({"token":data['token'], "trial_id":data["trial_id"]}, request.FILES)
+        print(data)
         if not form.is_valid():
             print(form.errors.as_json())
             response = json.loads(form.errors.as_json())
             print(response["__all__"][0]["message"])
             return HttpResponse("request isn't valid, "+response["__all__"][0]["message"])
         
-        if not checkRecordExistence(TrialData, {'trial_id':data['TrialID']}):
+        if not checkRecordExistence(TrialData, {'trial_id':data['trial_id']}):
             return HttpResponse("trial id not found")
         
         addInputData(data)
@@ -97,8 +102,8 @@ def uploadExperimentData(request):
 
 def addTrialToTable(form):
     newTrial = TrialData()
-    newTrial.user_id = form.data['userPin']
-    env = getRecord(Environments, {'device':form.data['Device'], 'grid':form.data['GridInterface']})
+    newTrial.user_id = form.data['user_id']
+    env = getRecord(Environments, {'device':form.data['device'], 'grid':form.data['grid']})
     newTrial.env_id = env.env_id
     newTrial.task_id = chooseRandomTask(newTrial.user_id) 
     newTrial.save()
@@ -146,7 +151,7 @@ def getTaskData(trial_id, env_id):
     return data
 
 def addInputData(data):
-    trial = getRecord(TrialData, {'trial_id':data['TrialID']})
+    trial = getRecord(TrialData, {'trial_id':data['trial_id']})
     trial.trial_start = parse_datetime(data['StartTime']) # convert to datetime?
     env = getRecord(Environments, {'env_id':trial.env_id}) # list or single
     grid = env.grid
@@ -154,7 +159,7 @@ def addInputData(data):
     num_correct = 0
     for i in range(1,len(data['imageTasks'])+1):
         input = InputData()
-        input.trial_id = data['TrialID']
+        input.trial_id = data['trial_id']
         input.image_id = data.imageTasks[i].photoID
         if data.imageTasks[i].userCorrect == "true": # what does actual value look like?
             input.correct = True
