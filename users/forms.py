@@ -1,6 +1,8 @@
 from django import forms
-
 from .models import UserData
+
+from django.forms import ValidationError
+from DataVizTrials.general import tokens
 
 class UserDataForm(forms.ModelForm):
 
@@ -19,3 +21,12 @@ class RecordConsentForm():
 
 class GetNameForm(forms.Form):
     pin = forms.IntegerField()
+    token = forms.CharField()
+
+    def clean(self):
+        cd = self.cleaned_data
+
+        token = cd.get("token")
+        if token not in tokens:
+            raise ValidationError(("user does not have access privilege"),code="invalid")
+        return cd

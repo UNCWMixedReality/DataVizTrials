@@ -1,9 +1,16 @@
+certifi==2019.11.28
+chardet==3.0.4
 Django==2.2.6
+django-extensions==2.2.6
 djangorestframework==3.10.3
+idna==2.8
 image==1.5.27
 jsonfield==2.0.2
 Pillow==6.2.1
 psycopg2==2.8.4
 pytz==2019.3
+requests==2.22.0
+six==1.14.0
 sqlparse==0.3.0
+urllib3==1.25.8
 Wand==0.5.7

@@ -12,14 +12,16 @@ from random import randint
 import json # for testing
 
 # TODO: 
-# - getName function level 1 else statement needs to be tested
-# - make  render vs httpresponse more consistent
-# - csrf exempt, way to get around it/ make it safer?
-# - do any functions here need a pin to be used?
 # - do i need to remove the consent part from the database? prob dont need yes/no anymore
+# - DONE: do any functions here need a pin to be used?
 # - DONE: parameterize "checkVal" functions
 # - DONE: parameterize "returnVal"
+# - do request checking in forms?
+# - make  render vs httpresponse more consistent... well it has forms
 # - making naming consistent
+# - should errors be httpresponseerror instead of httpresponse?
+# - csrf exempt, way to get around it/ make it safer?
+# - use proper form data
 
 def index(request):
     #template = loader.get_template('index.html')
@@ -39,6 +41,7 @@ def signup(request):
         return HttpResponseRedirect('/users/consentForm')
     else:
         form = UserDataForm
+        return HttpResponse(template.render(context, request))
         return render(request, 'signup.html', {'form': form})
 
 # TODO: what to do if they log out by accident before responding to consent form?
@@ -47,7 +50,7 @@ def recordConsent(request):
         return HttpResponseRedirect('/users/signup')
     
     pin = request.session['pin']
-    user = getRecord(UserData, formatFilter([("pin", pin)]))
+    user = getRecord(UserData, {"pin": pin})
 
     if request.method == "POST":
         del request.session['pin']
@@ -67,6 +70,7 @@ def recordConsent(request):
         return render(request, "consentForm.html", {'form': form})
 
 # TODO: what if user types both their name and their pin? go through or just look up the first?
+# not being used currently because of security issue: who is allowed to access this?
 def retrieveUserInfo(request):
     
     if request.method == "POST":
@@ -80,13 +84,13 @@ def retrieveUserInfo(request):
             userFound = False
             if (not nameGiven and pinGiven) or bothGiven :
                 try:
-                    user = getRecord(UserData, formatFilter([("pin", int(form.data['pin']))]))
+                    user = getRecord(UserData, {"pin":int(form.data['pin'])})
                     userFound = True
                 except:
                     pass
             elif (nameGiven and not pinGiven):
                 try:
-                    user = getRecord(UserData, formatFilter([("first_name", form["first_name"].value()),("last_name",form["last_name"].value())]))                    
+                    user = getRecord(UserData, {"first_name":form["first_name"].value(),"last_name":form["last_name"].value()})                  
                     userFound = True
                 except:
                     pass
@@ -117,18 +121,26 @@ def checkLogin(request):
         return True
     except KeyError:
         return False
-
+# TODO:
+# -  level 1 else statement needs to be tested
+# - should token check happen in forms?
 @csrf_exempt
 def getName(request):
     if request.method == "POST":
-        form = GetNameForm(request.POST)
-        if not form.is_valid():
-            return HttpResponse("request isn't valid")
         data=request.POST
-        print(data)
+        form = GetNameForm(request.POST)
+        print(form)
+        if not form.is_valid():
+            print(form.errors.as_json())
+            response = json.loads(form.errors.as_json())
+            print(response["__all__"][0]["message"])
+            return HttpResponse("request isn't valid, "+response["__all__"][0]["message"])
+        #if data['token'] not in tokens:
+        #    return HttpResponseNotFound("user does not have access privilege")
         try:    
-            if(checkRecordExistence(UserData, formatFilter([("pin",data["pin"])]))):
-                user = getRecord(UserData,formatFilter([("pin", data["pin"])]))
+            if(checkRecordExistence(UserData, {"pin":data["pin"]})):
+                print("ok")
+                user = getRecord(UserData,{"pin":data["pin"]})
                 response = JsonResponse({'name': " ".join([user.first_name, user.last_name])})
                 print(json.loads(response.content)['name']) # test
                 return response

@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 from DataVizTrials.general import *
 from .forms import ImageUploadForm
-from .models import TaskData, ImageData
+from .models import TaskData, ImageData 
 
 # Create your views here.
 import os
@@ -18,20 +18,14 @@ import os
 dataPathFile = open(os.path.join(os.path.realpath("."),"tasks/datapath.txt"), "r")
 dataPath = dataPathFile.readline().strip('\n')
 
-tokensFile = open(os.path.join(os.path.realpath("."),"tokens.txt"), "r")
-tokens = tokensFile.readlines()
-tokens = [x.strip('\n') for x in tokens]
-
 # TODO:
-# - deal with csrf exempt
-# - test bulk add of images: 5,10,20 :: 4 done
+# - test bulk add of images n = 5,10,20 :: n=4 done
 # - DONE: parameterize "checkVal" functions
 # - DONE: parameterize "returnVal" functions
 # - DONE: create form w/ file field or image field for imageUpload post req
 #   - leaves out files for now... how to do it with multiple?
-# - reading tokens.txt in each app is repetitive
-
-# needs better success response
+# - needs better success response
+# - deal with csrf exempt
 
 @csrf_exempt
 def imageUpload(request):
@@ -41,33 +35,38 @@ def imageUpload(request):
         print(data)
         form = ImageUploadForm(request.POST, {})
         if not form.is_valid():
-            return HttpResponseNotFound("request isn't valid")
-        if data['token'] not in tokens:
-            return HttpResponseNotFound("user does not have access privilege")
-        if not checkRecordExistence(TaskData, formatFilter([('category',data['category'])])):
+            print(form.errors.as_json())
+            response = json.loads(form.errors.as_json())
+            print(response["__all__"][0]["message"])
+            return HttpResponse("request isn't valid, "+response["__all__"][0]["message"])
+        # if data['token'] not in tokens:
+        #     return HttpResponseNotFound("user does not have access privilege")
+        if not checkRecordExistence(TaskData, {'category':data['category']}):
             addCategory(data['category'])
         for k,v in request.FILES.items():
             print(v.size)
+            print(data['in_category'])
             addImage(data,v)
         return HttpResponse("Got json data")
     else:
         return HttpResponseNotFound()
 
 def addImage(data, photo):
-    task = getRecord(TaskData, formatFilter([("category",data['category'])]))
+    task = getRecord(TaskData, {"category":data['category']})
 
     image_object = ImageData()
     image_object.task_id = task.task_id
 
     folder = ""
-    if data['in_category']:
+    if data['in_category'] == "True":
         image_object.in_category = True
         folder = "positive"
     else:
         image_object.in_category = False
         folder = "negative"
+    print("test", image_object.in_category, folder)
 
-    print("adding image to task", task.num_of_photos)
+    print("adding image to task, n = ", task.num_of_photos)
     task.num_of_photos += 1
     task.save()
 
