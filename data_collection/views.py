@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, JsonResponse
 
 from django.template import loader
-from django.utils.dateparse import parse_datetime
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 
@@ -21,6 +20,7 @@ import os
 import base64
 import json # for testing
 import random
+from datetime import datetime
 
 #from django.http.request import QueryDict # was used for testing request inpu
 
@@ -147,7 +147,7 @@ def getTaskData(trial_id, env_id):
 
 def addInputData(data):
     trial = getRecord(TrialData, {'trial_id':data['trial_id']})
-    trial.trial_start = parse_datetime(data['StartTime']) # convert to datetime?
+    trial.trial_start = datetime.strptime(data['StartTime'], "%Y-%m-%d-%H:%M:%S:%f") # convert to datetime?
     env = getRecord(Environments, {'env_id':trial.env_id}) # list or single
     grid = env.grid
 
@@ -172,6 +172,6 @@ def addInputData(data):
         else:
             input.input_start = parse_datetime(data["imageTasks"][i]["userDecisionPoints"][i-1][0])
         input.save()
-    trial.trial_end = parse_datetime(data["imageTasks"][i]["userDecisionPoints"][-1][0]) # convert to datetime?
+    trial.trial_end = datetime.strptime(data["imageTasks"][i]["userDecisionPoints"][-1][0], "%Y-%m-%d-%H:%M:%S:%f") # convert to datetime?
     trial.score = num_correct / len(data['imageTasks'])
     trial.save()
