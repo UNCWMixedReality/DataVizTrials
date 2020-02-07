@@ -35,12 +35,8 @@ def imageUpload(request):
         print(data)
         form = ImageUploadForm(request.POST, {})
         if not form.is_valid():
-            print(form.errors.as_json())
-            response = json.loads(form.errors.as_json())
-            print(response["__all__"][0]["message"])
-            return HttpResponse("request isn't valid, "+response["__all__"][0]["message"])
-        # if data['token'] not in tokens:
-        #     return HttpResponseNotFound("user does not have access privilege")
+            text = "request isn't valid: "+ handleJsonError(form)
+            return HttpResponse(text)
         if not checkRecordExistence(TaskData, {'category':data['category']}):
             addCategory(data['category'])
         for k,v in request.FILES.items():

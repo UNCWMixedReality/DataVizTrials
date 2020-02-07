@@ -34,17 +34,14 @@ import random
 def uploadExperimentParameters(request):
     if request.method == 'POST':
         #data =  json.loads(request.body)
-        data=request.body
+        data=request.POST
+        print(data)
         form = UploadExperimentParametersForm(data)
         if not form.is_valid():
-            print(form.errors.as_json())
-            response = json.loads(form.errors.as_json())
-            print(response["__all__"][0]["message"])
-            return HttpResponse("request isn't valid, "+response["__all__"][0]["message"])
-        
+            text = "request isn't valid: "+ handleJsonError(form)
+            return HttpResponse(text)
         if not checkRecordExistence(UserData, {'pin':form.data['user_id']}):
             return HttpResponse("pin not found")
-        
         if not checkRecordExistence(Environments, {'device':form.data['device'], 'grid':form.data['grid']}):
             return HttpResponse("environment conditions not found")
 
@@ -58,15 +55,12 @@ def uploadExperimentParameters(request):
 def sendTaskData(request):
     if request.method == 'POST':
         #data =  json.loads(request.body)
-        data=request.body
+        data=request.POST
         form = SendTaskDataForm(data, request.FILES)
         print(data)
         if not form.is_valid():
-            print(form.errors.as_json())
-            response = json.loads(form.errors.as_json())
-            print(response["__all__"][0]["message"])
-            return HttpResponse("request isn't valid, "+response["__all__"][0]["message"])
-        
+            text = "request isn't valid: "+ handleJsonError(form)
+            return HttpResponse(text)
         if not checkRecordExistence(TrialData, {'trial_id':form.data['trial_id']}):
             return HttpResponse("trial id not found")
 
@@ -85,15 +79,12 @@ def sendTaskData(request):
 def uploadExperimentData(request):
     if request.method == 'POST':
         #data = json.loads(request.body)
-        data=request.body
+        data=request.POST
         form = SendTaskDataForm({"token":data['token'], "trial_id":data["trial_id"]}, request.FILES)
         print(data)
         if not form.is_valid():
-            print(form.errors.as_json())
-            response = json.loads(form.errors.as_json())
-            print(response["__all__"][0]["message"])
-            return HttpResponse("request isn't valid, "+response["__all__"][0]["message"])
-        
+            text = "request isn't valid: "+ handleJsonError(form)
+            return HttpResponse(text)
         if not checkRecordExistence(TrialData, {'trial_id':data['trial_id']}):
             return HttpResponse("trial id not found")
         
@@ -137,8 +128,8 @@ def getTaskData(trial_id, env_id):
         not_in_category_num = 10
     trial = getRecord(TrialData, {'trial_id':trial_id})
     task_id = trial.task_id
-    in_category_images = getObject(ImageData,{"task_id":task_id,"in_category":True})
-    not_in_category_images = getObject(ImageData,{"task_id":task_id,"in_category":False})
+    in_category_images = list(ImageData.objects.filter(task_id=task_id,in_category=True))
+    not_in_category_images = list(ImageData.objects.filter(task_id=task_id,in_category=False))
     image_number = 1
     data = {}
     for images, num_photos in [(in_category_images,in_category_num), (not_in_category_images,not_in_category_num)]:
@@ -164,23 +155,23 @@ def addInputData(data):
     for i in range(1,len(data['imageTasks'])+1):
         input = InputData()
         input.trial_id = data['trial_id']
-        input.image_id = data.imageTasks[i].photoID
-        if data.imageTasks[i].userCorrect == "true": # what does actual value look like?
+        input.image_id = data["imageTasks"][i]["photoID"]
+        if data["imageTasks"][i]["userCorrect"] == "true": # what does actual value look like?
             input.correct = True
             num_correct += 1
         else:
             input.correct = False            
-        if data.imageTasks[i].userUndo == "true": # what does actual value look like?
+        if data["imageTasks"][i]["userUndo"] == "true": # what does actual value look like?
             input.undo = True
         else:
             input.undo = False
-        input.user_decision_points = json.dumps(data.imageTasks[i].userDecisionPoints)
-        input.input_end = parse_datetime(data.imageTasks[i].userDecisionPoints[-1][0])
+        input.user_decision_points = json.dumps(data["imageTasks"][i]["userDecisionPoints"])
+        input.input_end = parse_datetime(data["imageTasks"][i]["userDecisionPoints"][-1][0])
         if grid or (not grid and i == 1):
             input.input_start = parse_datetime(trial.trial_start)
         else:
-            input.input_start = parse_datetime(data.imageTasks[i].userDecisionPoints[i-1][0])
+            input.input_start = parse_datetime(data["imageTasks"][i]["userDecisionPoints"][i-1][0])
         input.save()
-    trial.trial_end = parse_datetime(data.imageTasks[i].userDecisionPoints[-1][0]) # convert to datetime?
+    trial.trial_end = parse_datetime(data["imageTasks"][i]["userDecisionPoints"][-1][0]) # convert to datetime?
     trial.score = num_correct / len(data['imageTasks'])
     trial.save()

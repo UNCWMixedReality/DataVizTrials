@@ -131,12 +131,8 @@ def getName(request):
         form = GetNameForm(request.POST)
         #print(form)
         if not form.is_valid():
-            print(form.errors.as_json())
-            response = json.loads(form.errors.as_json())
-            print(response["__all__"][0]["message"])
-            return HttpResponse("request isn't valid, "+response["__all__"][0]["message"])
-        #if data['token'] not in tokens:
-        #    return HttpResponseNotFound("user does not have access privilege")
+            text = "request isn't valid: "+ handleJsonError(form)
+            return HttpResponse(text)
         try:    
             if(checkRecordExistence(UserData, {"pin":data["pin"]})):
                 print("ok")
