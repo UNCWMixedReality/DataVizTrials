@@ -22,7 +22,7 @@ import base64
 import json # for testing
 import random
 
-#from django.http.request import QueryDict # was used for testing request input
+#from django.http.request import QueryDict # was used for testing request inpu
 
 # TODO:
 # - DONE: chooseRandomTask - find way to be pseudo-random / equal distribution
@@ -33,7 +33,8 @@ import random
 @csrf_exempt
 def uploadExperimentParameters(request):
     if request.method == 'POST':
-        data =  json.loads(request.body)
+        #data =  json.loads(request.body)
+        data=request.body
         form = UploadExperimentParametersForm(data)
         if not form.is_valid():
             print(form.errors.as_json())
@@ -56,7 +57,8 @@ def uploadExperimentParameters(request):
 @csrf_exempt
 def sendTaskData(request):
     if request.method == 'POST':
-        data =  json.loads(request.body)
+        #data =  json.loads(request.body)
+        data=request.body
         form = SendTaskDataForm(data, request.FILES)
         print(data)
         if not form.is_valid():
@@ -82,7 +84,8 @@ def sendTaskData(request):
 @csrf_exempt
 def uploadExperimentData(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
+        #data = json.loads(request.body)
+        data=request.body
         form = SendTaskDataForm({"token":data['token'], "trial_id":data["trial_id"]}, request.FILES)
         print(data)
         if not form.is_valid():
