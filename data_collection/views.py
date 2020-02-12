@@ -43,7 +43,7 @@ def uploadExperimentParameters(request):
         if not checkRecordExistence(UserData, {'pin':form.data['user_id']}):
             return HttpResponse("pin not found")
         grid = True
-        if form.data['grid'] == "False":
+        if form.data['grid'] == "false":
             grid = False
         if not checkRecordExistence(Environments, {'device':form.data['device'], 'grid':grid}):
             return HttpResponse("environment conditions not found")
