@@ -101,7 +101,10 @@ def uploadExperimentData(request):
 def addTrialToTable(form):
     newTrial = TrialData()
     newTrial.user_id = form.data['user_id']
-    env = getRecord(Environments, {'device':form.data['device'], 'grid':form.data['grid']})
+    grid = True
+    if form.data['grid'] == "false":
+        grid = False
+    env = getRecord(Environments, {'device':form.data['device'], 'grid':grid})
     newTrial.env_id = env.env_id
     newTrial.task_id = chooseRandomTask(newTrial.user_id) 
     newTrial.save()
