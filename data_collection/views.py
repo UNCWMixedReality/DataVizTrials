@@ -42,7 +42,10 @@ def uploadExperimentParameters(request):
             return HttpResponse(text)
         if not checkRecordExistence(UserData, {'pin':form.data['user_id']}):
             return HttpResponse("pin not found")
-        if not checkRecordExistence(Environments, {'device':form.data['device'], 'grid':form.data['grid']}):
+        grid = True
+        if form.data['grid'] == "false":
+            grid = False
+        if not checkRecordExistence(Environments, {'device':form.data['device'], 'grid':grid}):
             return HttpResponse("environment conditions not found")
 
         response = JsonResponse({'trial_id': addTrialToTable(form)})
@@ -114,7 +117,7 @@ def chooseRandomTask(user_id):
         chosen_task_objects = TrialData.objects.filter(user_id=user_id)
         chosen_task_ids = [task.task_id for task in chosen_task_objects]
         available_task_ids = list(set(all_task_ids)-set(chosen_task_ids))
-        return random.choice(available_task_ids)
+        return random.choice(available_task_ids) # assumes there is still a task to return
     else:
         return random.choice(all_task_ids)
 
@@ -148,6 +151,7 @@ def getTaskData(trial_id, env_id):
 def addInputData(data):
     trial = getRecord(TrialData, {'trial_id':data['trial_id']})
     trial.trial_start = datetime.strptime(data['StartTime'], "%Y-%m-%d-%H:%M:%S:%f") # convert to datetime?
+    print(trial.trial_start)
     env = getRecord(Environments, {'env_id':trial.env_id}) # list or single
     grid = env.grid
 
