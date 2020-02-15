@@ -119,7 +119,7 @@ def chooseRandomTask(user_id):
     all_task_ids = [task.task_id for task in all_task_objects]
     if checkRecordExistence(TrialData, {user_id:user_id}): 
         chosen_task_objects = TrialData.objects.filter(user_id=user_id)
-        chosen_task_ids = [task.task_id for task in chosen_task_objects]
+        chosen_task_ids = [task.task_id for task in chosen_task_objects if task.score==None]
         available_task_ids = list(set(all_task_ids)-set(chosen_task_ids))
         return random.choice(available_task_ids) # assumes there is still a task to return
     else:
