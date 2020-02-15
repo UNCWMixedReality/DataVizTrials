@@ -14,10 +14,7 @@ from .models import TaskData, ImageData
 
 # Create your views here.
 import os
-
-dataPathFile = open(os.path.join(os.path.realpath("."),"tasks/datapath.txt"), "r")
-dataPath = dataPathFile.readline().strip('\n')
-
+ 
 # TODO:
 # - test bulk add of images n = 5,10,20 :: n=4 done
 # - DONE: parameterize "checkVal" functions
@@ -56,30 +53,32 @@ def addImage(data, photo):
     folder = ""
     if data['in_category'] == "True":
         image_object.in_category = True
-        folder = "positive"
+        folder = "correct"
     else:
         image_object.in_category = False
-        folder = "negative"
+        folder = "incorrect"
     print("test", image_object.in_category, folder)
 
     print("adding image to task, n = ", task.num_of_photos)
     task.num_of_photos += 1
     task.save()
 
+    image_object.save()
+    #print("ID: ", image_object.image_id)
     # maybe rename var as original image 
-    original_path = os.path.join(dataPath, data['category'], folder, "original", str(task.num_of_photos)+photo.name[photo.name.rfind("."):])
+    original_path = os.path.join(dataPath, "original", str(task.task_id), folder,str(image_object.image_id)+photo.name[photo.name.rfind("."):])
     handle_uploaded_file(original_path, photo)
     image_object.image_path = original_path
 
-    texture_path = os.path.join(dataPath, data['category'], folder, "texture")
-    convertImgToDds(original_path, task.num_of_photos, texture_path)
-    image_object.texture_path = os.path.join(texture_path, str(task.num_of_photos)+".dds")
+    texture_path = os.path.join(dataPath, "texture", str(task.task_id), folder)
+    convertImgToDds(original_path, image_object.image_id, texture_path)
+    image_object.texture_path = os.path.join(texture_path, str(image_object.image_id)+".dds")
 
     image_object.save()
 
 def addCategory(category):
-    addCategoryToTable(category)
-    addCategoryToFileSystem(category)
+    id = addCategoryToTable(category)
+    addCategoryToFileSystem(str(id))
 
 def addCategoryToTable(category):
     newTask = TaskData()
@@ -89,22 +88,13 @@ def addCategoryToTable(category):
     return newTask.task_id
 
 def addCategoryToFileSystem(category):
-    writeFolder(os.path.join(dataPath, category))
-    writeFolder(os.path.join(dataPath, category, 'positive'))
-    writeFolder(os.path.join(dataPath, category, 'negative'))
 
-    writeFolder(os.path.join(dataPath, category, 'positive', 'original'))
-    writeFolder(os.path.join(dataPath, category, 'negative', 'original'))
-    writeFolder(os.path.join(dataPath, category, 'positive', 'texture'))
-    writeFolder(os.path.join(dataPath, category, 'negative', 'texture'))
-
-def writeFolder (path):
-    try:
-        # Create target Directory
-        os.mkdir(path)
-        print("Directory " , path ,  " Created ") 
-    except FileExistsError:
-        print("Directory " , path ,  " already exists")
+    writeFolder(os.path.join(dataPath, 'original', category))
+    writeFolder(os.path.join(dataPath, 'texture', category))
+    writeFolder(os.path.join(dataPath, 'original', category, 'correct'))
+    writeFolder(os.path.join(dataPath, 'original', category, 'incorrect'))
+    writeFolder(os.path.join(dataPath, 'texture', category, 'correct'))
+    writeFolder(os.path.join(dataPath, 'texture', category, 'incorrect'))
 
 def handle_uploaded_file(filePath, f):
     destination = open(filePath, 'wb+')

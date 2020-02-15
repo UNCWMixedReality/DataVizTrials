@@ -21,6 +21,10 @@ tokensFile = open(os.path.join(os.path.realpath("."),"tokens.txt"), "r")
 tokens = tokensFile.readlines()
 tokens = [x.strip('\n') for x in tokens]
 
+dataPathFile = open(os.path.join(os.path.realpath("."),"tasks/datapath.txt"), "r")
+dataPath = dataPathFile.readline().strip('\n')
+   
+
 def handleJsonError(form):
     message = ""
     try:
@@ -31,3 +35,11 @@ def handleJsonError(form):
         return message
     except:
         return "input are not in the proper form, or are missing"
+
+def writeFolder (path):
+    try:
+        # Create target Directory
+        os.mkdir(path)
+        print("Directory " , path ,  " Created ") 
+    except FileExistsError:
+        print("Directory " , path ,  " already exists")

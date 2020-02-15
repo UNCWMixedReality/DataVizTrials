@@ -69,7 +69,8 @@ def sendTaskData(request):
 
         trial = getRecord(TrialData, {'trial_id':form.data['trial_id']})
         task = getRecord(TaskData, {'task_id':trial.task_id})
-        response = JsonResponse({'category': task.category, 'image_tasks': getTaskData(form.data['trial_id'], trial.env_id)})
+        #response = JsonResponse({'category': task.category, 'image_tasks': getTaskData(form.data['trial_id'], trial.env_id)})
+        response = JsonResponse({'task_id':trial.task_id})
         return response
     else:
         return HttpResponseNotFound()
