@@ -4,6 +4,9 @@ from tasks.models import Environments
 
 from DataVizTrials.general import writeFolder, dataPath
 
+writeFolder(os.path.join(dataPath, 'original'))
+writeFolder(os.path.join(dataPath, 'texture'))
+
 ## the following sets up the environment options in the db
 envs = ['vr','desktop','tablet']
 grids = [True, False]
@@ -14,5 +17,3 @@ for env in envs:
         new_env.device = env
         new_env.grid = grid
         new_env.save()
-writeFolder(os.path.join(dataPath, 'original'))
-writeFolder(os.path.join(dataPath, 'texture'))

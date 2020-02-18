@@ -48,12 +48,14 @@ def uploadExperimentParameters(request):
         if not checkRecordExistence(Environments, {'device':form.data['device'], 'grid':grid}):
             return HttpResponse("environment conditions not found")
 
-        response = JsonResponse({'trial_id': addTrialToTable(form)})
+        trial = addTrialToTable(form)
+        response = JsonResponse({'trial_id': trial.trial_id, 'task_id':trial.task_id})
         return response
     else:
         return HttpResponseNotFound()
 
 # TODO: properly pull and package, (serialize) data and send out
+# not being used anymore.
 @csrf_exempt
 def sendTaskData(request):
     if request.method == 'POST':
@@ -109,7 +111,7 @@ def addTrialToTable(form):
     newTrial.env_id = env.env_id
     newTrial.task_id = chooseRandomTask(newTrial.user_id) 
     newTrial.save()
-    return newTrial.trial_id
+    return newTrial
 
 # if trial needs to be restarted, there will be an error since an entry exists for it-
 # so it won't be chosen again
