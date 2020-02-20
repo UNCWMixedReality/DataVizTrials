@@ -43,7 +43,7 @@ def uploadExperimentParameters(request):
         if not checkRecordExistence(UserData, {'pin':form.data['user_id']}):
             return HttpResponse("pin not found")
         grid = True
-        if form.data['grid'] == "false":
+        if form.data['grid'].lower() == "false":
             grid = False
         if not checkRecordExistence(Environments, {'device':form.data['device'], 'grid':grid}):
             return HttpResponse("environment conditions not found")
@@ -109,7 +109,7 @@ def addTrialToTable(form):
     newTrial = TrialData()
     newTrial.user_id = form.data['user_id']
     grid = True
-    if form.data['grid'] == "false":
+    if form.data['grid'].lower() == "false":
         grid = False
     env = getRecord(Environments, {'device':form.data['device'], 'grid':grid})
     newTrial.env_id = env.env_id
@@ -170,13 +170,13 @@ def addInputData(data):
         input = InputData()
         input.trial_id = data['trial_id']
         input.image_id = data["imageTasks"][i]["photoID"]
-        if data["imageTasks"][i]["userCorrect"] == "true": # what does actual value look like?
+        if data["imageTasks"][i]["userCorrect"].lower() == "true": # what does actual value look like?
             input.correct = True
             print("True!")
             num_correct += 1
         else:
             input.correct = False            
-        if data["imageTasks"][i]["userUndo"] == "true": # what does actual value look like?
+        if data["imageTasks"][i]["userUndo"].lower() == "true": # what does actual value look like?
             input.undo = True
         else:
             input.undo = False
