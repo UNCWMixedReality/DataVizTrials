@@ -183,8 +183,10 @@ def addInputData(data):
         input.user_decision_points = json.dumps(data["imageTasks"][i]["userDecisionPoints"])
         input.input_end = datetime.strptime(data["imageTasks"][i]["userDecisionPoints"][-1][0], "%Y-%m-%d-%H:%M:%S:%f")
         print(grid)
-        if grid or ((not grid) and (i == 0)):
+        if (grid and i < 10) or ((not grid) and (i == 0)):
             input.input_start = trial.trial_start
+        elif (grid and i > 10):
+            input.input_start = datetime.strptime(data["imageTasks"][i-10]["userDecisionPoints"][-1][0], "%Y-%m-%d-%H:%M:%S:%f")
         else:
             input.input_start = datetime.strptime(data["imageTasks"][i-1]["userDecisionPoints"][-1][0], "%Y-%m-%d-%H:%M:%S:%f")
         input.save()
