@@ -4,6 +4,9 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.template import loader
 from wand import image
 import json
+import shutil
+import os
+from PIL import Image
 
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
@@ -107,3 +110,80 @@ def convertImgToDds(img,id,path):
     with image.Image(filename=img) as im:
         im.compression = "dxt3"
         im.save(filename=os.path.join(path,str(id)+".dds"))
+
+def removeImage(image_id):
+    image = getRecord(ImageData, {'image_id':image_id})
+    task = getRecord(TaskData, {'task_id':image.task_id})
+    task.num_of_photos = task.num_of_photos - 1
+    task.save()
+    image.delete()
+
+def moveImage(image_id):
+    image = getRecord(ImageData, {'image_id':image_id})
+    in_category = image.in_category
+    new_in_category = not in_category
+    folder_text = "incorrect"
+    new_folder_text = "correct"
+    if in_category:
+        folder_text = "correct"
+        new_folder_text = "incorrect"
+    new_image_path = replaceTextInPath(image.image_path, folder_text, new_folder_text)
+    new_texture_path = replaceTextInPath(image.texture_path, folder_text, new_folder_text)
+    shutil.move(image.image_path,new_image_path)
+    shutil.move(image.texture_path,new_texture_path)
+    image.image_path = new_image_path
+    image.texture_path = new_texture_path
+    image.in_category = new_in_category
+    image.save()
+
+def replaceTextInPath(path, original, new):
+    start_pos = path.rfind(original)
+    first_half = path[:start_pos]
+    second_half = path[start_pos:]
+    end_pos = second_half.find("/")
+    second_half = second_half[end_pos:]
+    new_image_path = first_half + new + second_half
+    print(path, new_image_path)
+    return new_image_path
+
+def replaceBadTextures(image_id):
+    image = getRecord(ImageData, {'image_id':image_id})
+    new_texture_path = replaceTextInPath(image.image_path, "original", "texture")
+    print(new_texture_path)
+    shutil.copyfile(image.image_path, new_texture_path)
+    os.remove(image.texture_path)
+    image.texture_path = new_texture_path
+    image.save()
+
+def rotate(image_path, degrees_to_rotate, saved_location):
+    """
+    Rotate the given photo the amount of given degreesk, show it and save it
+    @param image_path: The path to the image to edit
+    @param degrees_to_rotate: The number of degrees to rotate the image
+    @param saved_location: Path to save the cropped image
+    """
+    image_obj = Image.open(image_path)
+    rotated_image = image_obj.rotate(degrees_to_rotate)
+    #file_format = image_path[-3:].upper()
+    rotated_image.save(saved_location)
+    #rotated_image.show()
+
+
+
+### - case by case code
+def rotateImages():
+    images = ImageData.objects.all()
+    print(len(images))
+    for image in images:
+        if image.texture_path[-3:].upper() not in ["DDS", "SVG"]:
+            if image.image_id >= 1961:
+                rotate(image.texture_path, 180, image.texture_path)
+                print(image.image_id)
+
+# for id in images[-2:]:
+#     image = ImageData.objects.get(image_id=id)
+#     if image.texture_path[-3:].upper() not in ["DDS", "SVG"]:
+#         rotate(image.texture_path, 180, image.texture_path)
+#         print(image.image_id)
+#     else:
+#         print(image.texture_path)

@@ -1,7 +1,7 @@
 import os, json
 def checkRecordExistence(model, filter):
     try:
-        model.objects.get(**filter)
+        model.objects.filter(**filter)
         return True
     except:
         return False
